@@ -20,8 +20,9 @@ function getEmitter() {
 
   function addEventListener(event, context, handler) {
     const eventListeners = eventListenerMapping.get(event);
-    if (typeof eventListeners === 'undefined') {
-      eventListenerMapping.set(event, [{ context: context, handler: handler }]);
+
+    if (!eventListeners) {
+      eventListenerMapping.set(event, [{ context, handler }]);
     } else {
       eventListeners.push({ context: context, handler: handler });
     }
@@ -30,6 +31,7 @@ function getEmitter() {
     for (const e of eventListenerMapping.keys()) {
       if (e === event || e.startsWith(event + '.')) {
         const eventListeners = eventListenerMapping.get(e);
+
         eventListenerMapping.set(
           e,
           eventListeners.filter(eventListener => eventListener.context !== context)
@@ -41,9 +43,11 @@ function getEmitter() {
     const result = [];
     let myEvent = event;
     let myEventDot = -1;
+
     do {
       const eventListeners = eventListenerMapping.get(myEvent);
-      if (typeof eventListeners !== 'undefined') {
+
+      if (eventListeners) {
         result.push(eventListeners);
       }
       myEventDot = myEvent.lastIndexOf('.');
@@ -100,8 +104,10 @@ function getEmitter() {
      */
     several: function(event, context, handler, times) {
       let myHandler = handler;
+
       if (times > 0) {
         let count = 0;
+
         myHandler = function() {
           if (count < times) {
             handler.call(context);
@@ -122,8 +128,10 @@ function getEmitter() {
      */
     through: function(event, context, handler, frequency) {
       let myHandler = handler;
+
       if (frequency > 0) {
         let count = 0;
+
         myHandler = function() {
           if (count === 0) {
             handler.call(context);
